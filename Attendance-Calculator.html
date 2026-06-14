@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attendance Calculator</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(-45deg,#6a11cb,#2575fc,#00c9ff,#92fe9d);
+    background-size:400% 400%;
+    animation:bgMove 10s ease infinite;
+}
+
+@keyframes bgMove{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
+
+.container{
+    width:420px;
+    padding:30px;
+    border-radius:25px;
+    background:rgba(255,255,255,0.15);
+    backdrop-filter:blur(15px);
+    box-shadow:0 8px 32px rgba(0,0,0,0.2);
+    color:white;
+    animation:fadeIn 1s ease;
+}
+
+@keyframes fadeIn{
+    from{
+        opacity:0;
+        transform:translateY(30px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+h1{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.input-group{
+    margin:15px 0;
+}
+
+label{
+    display:block;
+    margin-bottom:6px;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:12px;
+    outline:none;
+    font-size:16px;
+}
+
+button{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+    background:#00e676;
+    color:black;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.3s;
+    margin-top:10px;
+}
+
+button:hover{
+    transform:scale(1.05);
+    background:#69f0ae;
+}
+
+.result{
+    margin-top:25px;
+    text-align:center;
+}
+
+.progress-container{
+    width:100%;
+    height:20px;
+    background:rgba(255,255,255,0.2);
+    border-radius:20px;
+    overflow:hidden;
+    margin-top:15px;
+}
+
+.progress-bar{
+    height:100%;
+    width:0%;
+    border-radius:20px;
+    background:linear-gradient(90deg,#00ff87,#60efff);
+    transition:width 1s ease;
+}
+
+.card{
+    background:rgba(255,255,255,0.15);
+    padding:12px;
+    margin-top:12px;
+    border-radius:12px;
+}
+
+.footer{
+    text-align:center;
+    margin-top:15px;
+    font-size:13px;
+    opacity:0.8;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📚 Attendance Calculator</h1>
+
+    <div class="input-group">
+        <label>Total Classes Conducted</label>
+        <input type="number" id="total" placeholder="Enter total classes">
+    </div>
+
+    <div class="input-group">
+        <label>Classes Attended</label>
+        <input type="number" id="attended" placeholder="Enter attended classes">
+    </div>
+
+    <div class="input-group">
+        <label>Target Attendance (%)</label>
+        <input type="number" id="target" value="75">
+    </div>
+
+    <button onclick="calculateAttendance()">
+        Calculate Attendance
+    </button>
+
+    <div class="result" id="result"></div>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progress"></div>
+    </div>
+
+    <div class="footer">
+        Made with ❤️ for Students
+    </div>
+</div>
+
+<script>
+function calculateAttendance() {
+
+    let total = parseInt(document.getElementById("total").value);
+    let attended = parseInt(document.getElementById("attended").value);
+    let target = parseFloat(document.getElementById("target").value);
+
+    if(isNaN(total) || isNaN(attended) || total <= 0){
+        alert("Please enter valid numbers!");
+        return;
+    }
+
+    let percentage = ((attended / total) * 100).toFixed(2);
+
+    document.getElementById("progress").style.width =
+        Math.min(percentage,100) + "%";
+
+    let output = `
+        <div class="card">
+            <h2>${percentage}%</h2>
+            <p>Current Attendance</p>
+        </div>
+    `;
+
+    if(percentage < target){
+
+        let required = Math.ceil(
+            ((target * total) - (100 * attended)) /
+            (100 - target)
+        );
+
+        output += `
+        <div class="card">
+            📈 You need to attend
+            <b>${required}</b> more classes
+            continuously to reach
+            <b>${target}%</b>.
+        </div>
+        `;
+    }
+    else{
+
+        let bunk = Math.floor(
+            (100 * attended - target * total) / target
+        );
+
+        output += `
+        <div class="card">
+            🎉 Great! You can miss
+            <b>${bunk}</b> classes and still
+            maintain <b>${target}%</b>.
+        </div>
+        `;
+    }
+
+    let statusColor =
+        percentage >= target ? "#00ff99" : "#ffcc00";
+
+    output += `
+    <div class="card" style="border-left:5px solid ${statusColor}">
+        ${
+            percentage >= target
+            ? "✅ Safe Zone"
+            : "⚠ Attendance Below Target"
+        }
+    </div>
+    `;
+
+    document.getElementById("result").innerHTML = output;
+}
+</script>
+
+</body>
+</html>
